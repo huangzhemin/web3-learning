@@ -94,6 +94,7 @@ func respondWithError(c *gin.Context, code int, message string, err error) {
 
 // RegisterHandler 处理用户注册请求
 func RegisterHandler(c *gin.Context) {
+	log.Printf("用户注册请求: 用户名=%s, 邮箱=%s", c.PostForm("username"), c.PostForm("email"))
 	var newUser User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		respondWithError(c, http.StatusBadRequest, "无效的请求数据: "+err.Error(), err)
@@ -136,6 +137,7 @@ func RegisterHandler(c *gin.Context) {
 
 // LoginHandler 处理用户登录请求
 func LoginHandler(c *gin.Context) {
+	log.Printf("用户登录请求")
 	var loginDetails struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`
@@ -225,6 +227,8 @@ func AuthMiddleware() gin.HandlerFunc {
 // CreatePostHandler 处理创建文章的请求
 func CreatePostHandler(c *gin.Context) {
 	userID, _ := c.Get("userID")
+	log.Printf("创建文章请求: 用户ID=%v", userID)
+	userID, _ := c.Get("userID")
 
 	var newPost Post
 	if err := c.ShouldBindJSON(&newPost); err != nil {
@@ -250,6 +254,7 @@ func CreatePostHandler(c *gin.Context) {
 
 // GetAllPostsHandler 获取所有文章列表
 func GetAllPostsHandler(c *gin.Context) {
+	log.Printf("获取所有文章列表")
 	var posts []Post
 
 	// 可以添加分页功能
@@ -282,6 +287,7 @@ func GetAllPostsHandler(c *gin.Context) {
 
 // GetPostByIDHandler 获取单个文章详情
 func GetPostByIDHandler(c *gin.Context) {
+	log.Printf("获取文章详情: 文章ID=%s", c.Param("id"))
 	postID := c.Param("id")
 
 	var post Post
@@ -303,6 +309,8 @@ func GetPostByIDHandler(c *gin.Context) {
 
 // UpdatePostHandler 更新文章
 func UpdatePostHandler(c *gin.Context) {
+	userID, _ := c.Get("userID")
+	log.Printf("更新文章请求: 文章ID=%s, 用户ID=%v", c.Param("id"), userID)
 	postID := c.Param("id")
 	userID, _ := c.Get("userID")
 
@@ -351,6 +359,8 @@ func UpdatePostHandler(c *gin.Context) {
 
 // DeletePostHandler 删除文章
 func DeletePostHandler(c *gin.Context) {
+	userID, _ := c.Get("userID")
+	log.Printf("删除文章请求: 文章ID=%s, 用户ID=%v", c.Param("id"), userID)
 	postID := c.Param("id")
 	userID, _ := c.Get("userID")
 
@@ -398,6 +408,8 @@ type CommentResponse struct {
 
 // 创建评论（需要认证）
 func CreateCommentHandler(c *gin.Context) {
+	userIDVal, _ := c.Get("userID")
+	log.Printf("创建评论请求: 文章ID=%s, 用户ID=%v", c.Param("id"), userIDVal)
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
@@ -454,6 +466,7 @@ func CreateCommentHandler(c *gin.Context) {
 
 // 获取某篇文章的所有评论（公开接口）
 func GetCommentsByPostHandler(c *gin.Context) {
+	log.Printf("获取评论列表: 文章ID=%s", c.Param("id"))
 	postIDStr := c.Param("id")
 	postID, err := strconv.Atoi(postIDStr)
 	if err != nil {
