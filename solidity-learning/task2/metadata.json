@@ -1,0 +1,15 @@
+{
+    "name": "My First NFT",
+    "description": "这是我的第一个图文NFT示例。",
+    "image": "ipfs://bafybeifcp7bt6e2gnqpi6smeeswk7s2lhfkyupc6g63jdqfuiv4yv5epqm/patrickhuang.png",
+    "attributes": [
+        {
+            "trait_type": "Background",
+            "value": "Blue"
+        },
+        {
+            "trait_type":"Mood",
+            "value": "Happy"
+        }
+    ]
+}
