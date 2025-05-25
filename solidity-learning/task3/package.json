@@ -1,0 +1,33 @@
+{
+  "name": "nft-auction-marketplace",
+  "version": "1.0.0",
+  "description": "NFT拍卖市场智能合约",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "deploy": "hardhat deploy",
+    "deploy:sepolia": "hardhat deploy --network sepolia --tags all",
+    "upgrade:sepolia": "hardhat deploy --network sepolia --tags upgrade"
+  },
+  "keywords": [
+    "nft",
+    "auction",
+    "blockchain",
+    "ethereum",
+    "chainlink",
+    "ccip"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0",
+    "@chainlink/contracts": "^0.8.0",
+    "dotenv": "^16.0.0",
+    "hardhat": "^2.24.0",
+    "hardhat-deploy": "^0.11.0"
+  }
+}
