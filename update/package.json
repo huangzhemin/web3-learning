@@ -6,8 +6,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.js --network localhost",
-    "upgrade": "hardhat run scripts/upgrade.js --network localhost",
+    "deploy": "hardhat run scripts/deploy.js --network sepolia",
+    "upgrade": "hardhat run scripts/upgrade.js --network sepolia",
     "node": "hardhat node"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "@types/chai": "^4.3.20",
     "@types/mocha": "^10.0.10",
     "chai": "^4.5.0",
+    "dotenv": "^17.2.1",
     "ethers": "^6.15.0",
     "hardhat": "^2.20.0",
     "hardhat-gas-reporter": "^1.0.10",

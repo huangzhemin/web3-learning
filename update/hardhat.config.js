@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require('@openzeppelin/hardhat-upgrades');
+require('dotenv').config();
 
 module.exports = {
   solidity: {
@@ -27,6 +28,14 @@ module.exports = {
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545"
+    },
+    sepolia: {
+      url: process.env.SEPOLIA_URL || "https://sepolia.infura.io/v3/YOUR-PROJECT-ID",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 11155111
     }
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
   }
 }; 

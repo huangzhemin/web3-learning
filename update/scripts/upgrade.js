@@ -8,7 +8,7 @@ async function main() {
   console.log("升级账户:", deployer.address);
   
   // 这里需要填入之前部署的代理合约地址
-  const proxyAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"; // 请替换为实际的代理合约地址
+  const proxyAddress = "0xc2b0eA0d7FBEAd555f7b2E0345aCCfE50d2e5875"; // 请替换为实际的代理合约地址
   
   if (proxyAddress === "0x...") {
     console.error("请先部署合约，然后更新此脚本中的代理合约地址");
@@ -40,35 +40,64 @@ async function main() {
   console.log("\n验证升级后的功能...");
   const storageV2 = StorageV2.attach(proxyAddress);
   
-  // 检查版本
-  const version = await storageV2.getVersion();
-  console.log("新版本:", version);
-  
-  // 检查现有数据是否保留
-  const value = await storageV2.getValue();
-  const name = await storageV2.getName();
-  console.log("保留的值:", value.toString());
-  console.log("保留的名称:", name);
-  
-  // 测试新功能
-  console.log("\n测试新功能...");
-  const timestamp = await storageV2.getTimestamp();
-  console.log("时间戳:", timestamp.toString());
-  
-  // 测试批量设置功能
-  console.log("测试批量设置功能...");
-  const tx = await storageV2.batchSet(100, "Upgraded Contract");
-  await tx.wait();
-  
-  const newValue = await storageV2.getValue();
-  const newName = await storageV2.getName();
-  const newTimestamp = await storageV2.getTimestamp();
-  
-  console.log("新值:", newValue.toString());
-  console.log("新名称:", newName);
-  console.log("新时间戳:", newTimestamp.toString());
-  
-  console.log("\n升级验证完成！");
+  try {
+    // 检查版本
+    const version = await storageV2.getVersion();
+    console.log("新版本:", version);
+    
+    // 检查现有数据是否保留
+    const value = await storageV2.getValue();
+    const name = await storageV2.getName();
+    console.log("保留的值:", value.toString());
+    console.log("保留的名称:", name);
+    
+    // 测试新功能
+    console.log("\n测试新功能...");
+    
+    // 检查是否有 getTimestamp 方法
+    try {
+      const timestamp = await storageV2.getTimestamp();
+      console.log("时间戳:", timestamp.toString());
+    } catch (error) {
+      console.log("⚠️ getTimestamp 方法调用失败，可能升级未完全成功");
+      console.log("错误详情:", error.message);
+    }
+    
+    // 测试批量设置功能
+    console.log("测试批量设置功能...");
+    try {
+      const tx = await storageV2.batchSet(100, "Upgraded Contract");
+      await tx.wait();
+      
+      const newValue = await storageV2.getValue();
+      const newName = await storageV2.getName();
+      console.log("新值:", newValue.toString());
+      console.log("新名称:", newName);
+      
+      // 再次尝试获取时间戳
+      try {
+        const newTimestamp = await storageV2.getTimestamp();
+        console.log("新时间戳:", newTimestamp.toString());
+      } catch (error) {
+        console.log("⚠️ 升级后仍然无法调用 getTimestamp 方法");
+        console.log("建议检查升级是否成功完成");
+      }
+      
+    } catch (error) {
+      console.log("⚠️ batchSet 方法调用失败");
+      console.log("错误详情:", error.message);
+    }
+    
+    console.log("\n升级验证完成！");
+    
+  } catch (error) {
+    console.error("❌ 升级验证过程中发生错误:");
+    console.error("错误详情:", error.message);
+    console.log("\n建议:");
+    console.log("1. 检查合约是否真正升级成功");
+    console.log("2. 确认代理合约地址正确");
+    console.log("3. 检查网络连接和 gas 费用");
+  }
 }
 
 main()
