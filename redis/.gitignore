@@ -1,0 +1,34 @@
+# Node
+node_modules/
+.npmrc
+
+# Env files
+.env
+.env.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+debug.log
+
+# OS
+.DS_Store
+
+# Editors/IDE
+.vscode/
+.idea/
+
+# Coverage / build outputs
+coverage/
+dist/
+
+# Redis artifacts (if any)
+dump.rdb
+appendonly.aof
+
+# REPL history
+.node_repl_history
