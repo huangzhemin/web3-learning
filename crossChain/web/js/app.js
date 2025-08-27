@@ -152,11 +152,19 @@ class CrossChainSimulator {
         targetSelect.innerHTML = '<option value="">Select target network</option>';
         
         if (sourceNetwork) {
+            // Get all available networks from the source select
+            const sourceSelect = document.getElementById('source-network');
+            const allOptions = Array.from(sourceSelect.options);
+            
             // Add all networks except the selected source network
-            const sourceOption = targetSelect.querySelector(`option[value="${sourceNetwork}"]`);
-            if (sourceOption) {
-                sourceOption.remove();
-            }
+            allOptions.forEach(option => {
+                if (option.value && option.value !== sourceNetwork) {
+                    const newOption = document.createElement('option');
+                    newOption.value = option.value;
+                    newOption.textContent = option.textContent;
+                    targetSelect.appendChild(newOption);
+                }
+            });
         }
     }
 
