@@ -265,3 +265,38 @@ func (sim *CrossChainSimulator) GetNetworkStats() map[string]interface{} {
 
 	return stats
 }
+
+// CreateAccount creates a new account on a specific network with an optional initial balance
+func (sim *CrossChainSimulator) CreateAccount(networkID string, initialBalance *big.Int) (*blockchain.Account, error) {
+	network, exists := sim.networks.GetNetwork(networkID)
+	if !exists {
+		return nil, fmt.Errorf("network %s not found", networkID)
+	}
+	acct := network.CreateAccount()
+	if initialBalance != nil {
+		acct.Balance.Set(initialBalance)
+	}
+	return acct, nil
+}
+
+// GetAccount returns an account on a specific network
+func (sim *CrossChainSimulator) GetAccount(networkID, address string) (*blockchain.Account, error) {
+	network, exists := sim.networks.GetNetwork(networkID)
+	if !exists {
+		return nil, fmt.Errorf("network %s not found", networkID)
+	}
+	acct, ok := network.GetAccount(address)
+	if !ok {
+		return nil, fmt.Errorf("account %s not found", address)
+	}
+	return acct, nil
+}
+
+// NetworkTransfer performs a transfer on a single network
+func (sim *CrossChainSimulator) NetworkTransfer(networkID, from, to string, amount *big.Int) (*blockchain.Transaction, error) {
+	network, exists := sim.networks.GetNetwork(networkID)
+	if !exists {
+		return nil, fmt.Errorf("network %s not found", networkID)
+	}
+	return network.Transfer(from, to, amount)
+}

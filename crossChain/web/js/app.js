@@ -68,6 +68,36 @@ class CrossChainSimulator {
         document.getElementById('source-network').addEventListener('change', () => {
             this.updateTargetNetworkOptions();
         });
+
+        // Create test source account
+        const btnCreate = document.getElementById('btn-create-source');
+        if (btnCreate) {
+            btnCreate.addEventListener('click', () => this.createTestSourceAccount());
+        }
+    }
+
+    async createTestSourceAccount() {
+        const networkId = document.getElementById('source-network').value;
+        if (!networkId) {
+            this.showToast('Please select a source network first', 'error');
+            return;
+        }
+        try {
+            const resp = await fetch(`/api/v1/networks/${networkId}/accounts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ initial_balance: '10000000000000000000' }) // 10 ETH
+            });
+            const data = await resp.json();
+            if (data.success) {
+                document.getElementById('source-address').value = data.data.address;
+                this.showToast('Test account created and funded', 'success');
+            } else {
+                this.showToast(data.error || 'Failed to create account', 'error');
+            }
+        } catch (e) {
+            this.showToast('Network error creating account', 'error');
+        }
     }
 
     async loadInitialData() {

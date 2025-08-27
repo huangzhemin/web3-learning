@@ -118,15 +118,34 @@ func (s *Server) createAccount(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	networkID := vars["id"]
 
-	// This would need to be implemented in the simulator
-	// For now, return a placeholder response
-	s.sendJSON(w, Response{
-		Success: true,
-		Data: map[string]string{
-			"network_id": networkID,
-			"message":    "Account creation endpoint - implementation needed",
-		},
-	})
+	var body struct {
+		InitialBalance string `json:"initial_balance"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&body)
+
+	var initial *big.Int
+	if body.InitialBalance != "" {
+		if v, ok := new(big.Int).SetString(body.InitialBalance, 10); ok {
+			initial = v
+		}
+	}
+	// default faucet 10 ether (wei)
+	if initial == nil {
+		initial = new(big.Int)
+		initial.SetString("10000000000000000000", 10)
+	}
+
+	acct, err := s.simulator.CreateAccount(networkID, initial)
+	if err != nil {
+		s.sendJSON(w, Response{Success: false, Error: err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	s.sendJSON(w, Response{Success: true, Data: map[string]interface{}{
+		"network_id": networkID,
+		"address":    acct.Address,
+		"balance":    acct.Balance.String(),
+	}})
 }
 
 // getAccount returns account information
@@ -135,15 +154,18 @@ func (s *Server) getAccount(w http.ResponseWriter, r *http.Request) {
 	networkID := vars["id"]
 	address := vars["address"]
 
-	// This would need to be implemented in the simulator
-	s.sendJSON(w, Response{
-		Success: true,
-		Data: map[string]interface{}{
-			"network_id": networkID,
-			"address":    address,
-			"message":    "Account info endpoint - implementation needed",
-		},
-	})
+	acct, err := s.simulator.GetAccount(networkID, address)
+	if err != nil {
+		s.sendJSON(w, Response{Success: false, Error: err.Error()}, http.StatusNotFound)
+		return
+	}
+
+	s.sendJSON(w, Response{Success: true, Data: map[string]interface{}{
+		"network_id": networkID,
+		"address":    acct.Address,
+		"balance":    acct.Balance.String(),
+		"nonce":      acct.Nonce,
+	}})
 }
 
 // transfer performs a transfer on a single network
@@ -157,24 +179,19 @@ func (s *Server) transfer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse amount
 	amount, ok := new(big.Int).SetString(req.Amount, 10)
 	if !ok {
 		s.sendJSON(w, Response{Success: false, Error: "Invalid amount"}, http.StatusBadRequest)
 		return
 	}
 
-	// This would need to be implemented in the simulator
-	s.sendJSON(w, Response{
-		Success: true,
-		Data: map[string]interface{}{
-			"network_id": networkID,
-			"from":       req.From,
-			"to":         req.To,
-			"amount":     amount.String(),
-			"message":    "Transfer endpoint - implementation needed",
-		},
-	})
+	tx, err := s.simulator.NetworkTransfer(networkID, req.From, req.To, amount)
+	if err != nil {
+		s.sendJSON(w, Response{Success: false, Error: err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	s.sendJSON(w, Response{Success: true, Data: tx})
 }
 
 // initiateTransfer starts a cross-chain transfer
